@@ -1,0 +1,19 @@
+{
+  "name": "mystical_bot",
+  "version": "1.0.0",
+  "description": "A high quality Discord bot written in TypeScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AlienTheBetrayer/MysticalBot"
+  },
+  "author": "AlienTheBetrayer",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "typescript": "^4.1.3"
+  }
+}
