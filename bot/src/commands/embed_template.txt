@@ -1,0 +1,5 @@
+const embed: Discord.MessageEmbed = new Discord.MessageEmbed();
+embed.setColor(bot_config.colors.default);
+embed.setAuthor(message.author.username + "#" + message.author.discriminator, message.author.displayAvatarURL());
+embed.setTimestamp();
+embed.setFooter(`${settings.get(message?.guild?.id as string)?.get("prefix")}${config.name}`, client?.user?.displayAvatarURL());

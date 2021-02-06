@@ -1,0 +1,9 @@
+{
+    "emojis" : {
+        "wrong" : "❌",
+        "correct" : "✔️"
+    },
+    "colors" : {
+        "default" : "2e5a90"
+    }
+}
