@@ -15,14 +15,16 @@ import private_config from "../../config/private_config.json";
  * @param client The discord client
  * @param args All the remaining arguments
  */
-export const run: devconfig.event_function = async (client: Discord.Client, connection: MySQL.Connection, commands: Map<string[], devconfig.command_function>, settings: Map<string, Map<string, string>>, ...args: any): Promise<void> => {
+export const run: devconfig.event_function = async (client: Discord.Client, connection: MySQL.Connection, storage: devconfig.bot_storage, ...args: any): Promise<void> => {
     client?.user?.setActivity(`${private_config.status} | $help`, {type: "STREAMING", url: "https://www.twitch.tv/alienbetrayer"});
+    console.log("[INFO] Client is ready.");
 }
 
 /**
  * The event's config.
  */
 export const config: devconfig.event_config = {
-    name: "ready"
+    name: "ready",
+    noload: false
 }
 

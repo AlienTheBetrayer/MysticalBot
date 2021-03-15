@@ -1,6 +1,7 @@
 // Libraries
 import * as Discord from "discord.js";
 import * as MySQL from "mysql";
+import * as Canvas from "canvas";
 
 // Configs and other dependencies
 import * as devconfig from "../../../config/devconfig";
@@ -21,14 +22,25 @@ export const run: devconfig.command_function = async (client: Discord.Client, me
     const prefix: string = await helper.get_prefix(message?.guild?.id, storage.settings);
     const embed_color: string = await helper.get_embed_color(message?.guild?.id, storage.settings);
 
-    // The embed that contains the prefix
+    // Canvas
+    const canvas: Canvas.Canvas = Canvas.createCanvas(parseInt(bot_config.canvas_size), parseInt(bot_config.canvas_size));
+    const ctx: Canvas.CanvasRenderingContext2D = canvas.getContext("2d");
+    ctx.fillStyle = `#${embed_color.toUpperCase()}`;
+    ctx.fillRect(0, 0, parseInt(bot_config.canvas_size), parseInt(bot_config.canvas_size));
+
+    // Image attachment
+    const attachment: Discord.MessageAttachment = new Discord.MessageAttachment(canvas.toBuffer(), "image.png");
+    
+    // The embed that contains the embed color
     const embed: Discord.MessageEmbed = new Discord.MessageEmbed();
     embed.setColor(embed_color);
     embed.setAuthor(message.author.username + "#" + message.author.discriminator, message.author.displayAvatarURL());
     embed.setTimestamp();
     embed.setFooter(`${prefix}${config.name}`, client?.user?.displayAvatarURL());
-    embed.setTitle("Prefix");
-    embed.setDescription(`\`\`\`${prefix}\`\`\``);
+    embed.setTitle("Embed color");
+    embed.setDescription(`\`\`\`${embed_color}\`\`\``);
+    embed.attachFiles([attachment]);
+    embed.setImage(`attachment://image.png`)
     
     message.channel.send(embed).then(() => {
         helper.correct(message);
@@ -39,9 +51,9 @@ export const run: devconfig.command_function = async (client: Discord.Client, me
  * Command's config.
  */
 export const config: devconfig.command_config = {
-    name: "getprefix",
-    description: "Shows the current prefix in the current guild.",
+    name: "getembedcolor",
+    aliases: [],
+    description: "Shows the current embed color in the current guild.",
     mod: "Help",
-    args: [],
-    aliases: ["prefixget", "prefix"]
+    args: []
 }

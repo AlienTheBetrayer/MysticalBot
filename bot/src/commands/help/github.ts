@@ -2,7 +2,7 @@
 import * as Discord from "discord.js";
 import * as MySQL from "mysql";
 
-// Configs and other dependencies
+// Dependencies
 import * as devconfig from "../../../config/devconfig";
 import * as helper from "../../helper_functions"
 
@@ -21,16 +21,17 @@ export const run: devconfig.command_function = async (client: Discord.Client, me
     const prefix: string = await helper.get_prefix(message?.guild?.id, storage.settings);
     const embed_color: string = await helper.get_embed_color(message?.guild?.id, storage.settings);
 
-    // The embed that contains the prefix
+    // Embed
     const embed: Discord.MessageEmbed = new Discord.MessageEmbed();
     embed.setColor(embed_color);
     embed.setAuthor(message.author.username + "#" + message.author.discriminator, message.author.displayAvatarURL());
     embed.setTimestamp();
     embed.setFooter(`${prefix}${config.name}`, client?.user?.displayAvatarURL());
-    embed.setTitle("Prefix");
-    embed.setDescription(`\`\`\`${prefix}\`\`\``);
-    
-    message.channel.send(embed).then(() => {
+    embed.setTitle("Github");
+    embed.setURL("https://github.com/AlienTheBetrayer/MysticalBot");
+    embed.setDescription("```Repository link```");
+
+    message.channel.send(embed).then((): void => {
         helper.correct(message);
     });
 }
@@ -39,9 +40,9 @@ export const run: devconfig.command_function = async (client: Discord.Client, me
  * Command's config.
  */
 export const config: devconfig.command_config = {
-    name: "getprefix",
-    description: "Shows the current prefix in the current guild.",
-    mod: "Help",
+    name: "github",
+    aliases: [],
+    description: "Sends an embed that contains the link to the github repository of this bot.",
     args: [],
-    aliases: ["prefixget", "prefix"]
+    mod: "Help"
 }

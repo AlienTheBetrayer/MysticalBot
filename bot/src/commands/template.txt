@@ -16,8 +16,10 @@ import private_config from "../../../config/private_config.json";
  * @param message The last message that invoked this command
  * @param args All the remaining arguments
  */
-export const run: devconfig.command_function = async (client: Discord.Client, message: Discord.Message, connection: MySQL.Connection, args: string[]): Promise<void> => {
-
+export const run: devconfig.command_function = async (client: Discord.Client, message: Discord.Message, connection: MySQL.Connection, storage: devconfig.bot_storage, args: string[]): Promise<void> => {
+    // Settings
+    const prefix: string = await helper.get_prefix(message?.guild?.id, storage.settings);
+    const embed_color: string = await helper.get_embed_color(message?.guild?.id, storage.settings);
 }
 
 /**
@@ -25,5 +27,8 @@ export const run: devconfig.command_function = async (client: Discord.Client, me
  */
 export const config: devconfig.command_config = {
     name: "",
-    aliases: []
+    aliases: [],
+    description: "",
+    args: [],
+    mod: ""
 }

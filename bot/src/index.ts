@@ -9,15 +9,21 @@ import config from "../config/config.json";
 import private_config from "../config/private_config.json";
 
 import * as helper from "./helper_functions";
-import * as devconfig from "../config/devconfig"
+import * as devconfig from "../config/devconfig";
 
 // Initializing the client
-const client: Discord.Client = new Discord.Client();
+const intents: Discord.Intents = new Discord.Intents([
+    Discord.Intents.NON_PRIVILEGED,
+    "GUILD_MEMBERS", "GUILD_PRESENCES"
+]);
+const client: Discord.Client = new Discord.Client({ ws : { intents } });
 
 // Bot storage  
-const commands = new Map<string[], devconfig.command_function>(); // [name, aliases...] : { command }
-const events = new Map<string, devconfig.event_function>(); // name : event
-const settings = new Map<string, Map<string, string>>(); // setting : value
+const storage: devconfig.bot_storage = {
+    commands : new Map<string[], devconfig.command>(),
+    events : new Map<string, devconfig.event>(),
+    settings : new Map<string, Map<string, string>>()
+};
 
 
 
@@ -40,28 +46,30 @@ const read_files = (path: string, callback_fn: (arg0: string) => void): void => 
  * @param args All the arguments that will be passed to the event function
  */
 const handle_event = (event_name: string, ...args: any): void => {
-    events.get(event_name)?.(client, connection, commands, settings, ...args);
+    storage.events.get(event_name)?.run(client, connection, storage, ...args);
 };
 
 
 
 // Storing all the commands
-read_files("./commands/", (command_folder: string): void => {
-    if(command_folder != "template.txt") { 
-        read_files(`./commands/${command_folder}`, (command_file: string): void => {
-            const cmd: devconfig.command = require(`./commands/${command_folder}/${command_file}`);
-            commands.set([cmd.config.name, ...cmd.config.aliases], cmd.run);
+read_files(`${__dirname}/commands/`, (command_folder: string): void => {
+    if(!command_folder.includes("template")) { 
+        read_files(`${__dirname}/commands/${command_folder}`, (command_file: string): void => {
+            const cmd: devconfig.command = require(`${__dirname}/commands/${command_folder}/${command_file}`);
+            storage.commands.set([cmd.config.name, ...cmd.config.aliases], cmd);
             console.log(`[INFO] ${command_file} command has been successfully loaded.`);
         });
     }   
 })
 
 // Storing all the events 
-read_files("./events/", (event_file: string): void => {
-    if(event_file != "template.txt") {
-        const event: devconfig.event = require(`./events/${event_file}`);
-        events.set(event.config.name, event.run);
-        console.log(`[INFO] ${event_file} event has been successfully loaded.`);
+read_files(`${__dirname}/events`, (event_file: string): void => {
+    if(!event_file.includes("template")) { 
+        const event: devconfig.event = require(`${__dirname}/events/${event_file}`);
+        if(!event.config.noload) {
+            storage.events.set(event.config.name, event);
+            console.log(`[INFO] ${event_file} event has been successfully loaded.`);
+        }
     }
 });
 
@@ -81,15 +89,13 @@ interface settings_db {
 };
 
 const load_settings = async (): Promise<void> => {
-    helper.mysql_query(connection, `SELECT * FROM settings`)
-    .then((settings_rows: any): void => {
+    helper.mysql_query(connection, `SELECT * FROM settings`).then((settings_rows: any): void => {
         for(let i = 0; i < settings_rows.length; ++i) {
             const row: settings_db = settings_rows[i];
-            if(settings.has(row.guild_id)) {
-                settings.get(row.guild_id)?.set(row.setting, row.value);
-            } else {
-                settings.set(row.guild_id, new Map<string, string>([[row.setting, row.value]]));
-            }
+            if(storage.settings.has(row.guild_id))
+                storage.settings.get(row.guild_id)?.set(row.setting, row.value);
+            else
+                storage.settings.set(row.guild_id, new Map<string, string>([[row.setting, row.value]]));
         }
     });
 };
@@ -109,7 +115,7 @@ client.on("ready", (): void => {
 });
 
 client.on("message", (message): void => {
-    handle_event("message", message, commands, connection, settings);
+    handle_event("message", message, storage, connection);
 });
 
 

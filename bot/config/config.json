@@ -1,9 +1,27 @@
 {
+    "canvas_size" : "128",
     "emojis" : {
         "wrong" : "❌",
-        "correct" : "✔️"
+        "correct" : "✔️",
+        "black_circle" : "⚫",
+        "blue_circle" : "🔵",
+        "brown_circle" : "🟤",
+        "green_circle" : "🟢",
+        "orange_circle" : "🟠",
+        "purple_circle" : "🟣",
+        "red_circle" : "🔴",
+        "white_circle" : "⚪",
+        "yellow_circle" : "🟡"
+    },
+    "defaults" : {
+        "color" : "2E5A90",
+        "prefix" : "$",
+        "online_status" : "🟢",
+        "away_status" : "🟠",
+        "dnd_status" : "🔴",
+        "offline_status" : "⚫"
     },
     "colors" : {
-        "default" : "2e5a90"
+        "warn" : "C8741A"
     }
 }
